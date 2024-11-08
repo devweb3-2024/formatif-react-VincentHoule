@@ -15,7 +15,7 @@ const Jeu: React.FC = () => {
   } | null>(null);
 
   useEffect(() => {
-    setMotCible(obtenirMotAleatoire());
+    setMotCible(obtenirMotAleatoire().normalize('NFD').replace(/[\u0300-\u036f]/g, ""));
   }, []);
 
   useEffect(() => {
@@ -32,7 +32,7 @@ const Jeu: React.FC = () => {
         text: 'Félicitations ! Vous avez trouvé le mot !',
         severity: 'success',
       });
-    } else if (essais.length >= 6) {
+    } else if (essais.length > 6) {
       setFinPartie(true);
       setMessage({
         text: `Dommage ! Le mot était "${motCible}".`,
@@ -40,6 +40,15 @@ const Jeu: React.FC = () => {
       });
     }
   };
+
+  // VH sert à trouver le mot ciblé et à ignorer les accents
+  function TrouverMot(mot: String): boolean {
+    listeMots.forEach(motPotentiel => {
+      if (motPotentiel.normalize('NFD').replace(/[\u0300-\u036f]/g, "") == mot.toLowerCase())
+        return true
+    });
+    return false
+  }
 
   const handleSoumettreEssai = () => {
     if (essaiCourant.length !== 5) {
@@ -49,12 +58,8 @@ const Jeu: React.FC = () => {
       });
       return;
     }
-    if (
-      !listeMots.includes(
-        essaiCourant.charAt(0).toUpperCase() +
-          essaiCourant.slice(1).toLowerCase()
-      )
-    ) {
+    // condtion s'il le mot n'existe pas
+    if (TrouverMot(essaiCourant)) {
       setMessage({
         text: "Ce mot n'est pas dans la liste.",
         severity: 'error',
@@ -65,8 +70,18 @@ const Jeu: React.FC = () => {
     setEssaiCourant('');
   };
 
+  // VH réinitialiser les constantes pour une nouvelle partie
+  const recommencerPartie = () => {
+    setMotCible(obtenirMotAleatoire())
+    setEssaiCourant('')
+    setEssais([])
+    setFinPartie(false)
+  };
+
+
   return (
     <Container maxWidth="sm">
+      <div>${motCible}</div>
       <GrilleMot
         essais={essais}
         motCible={motCible}
@@ -77,6 +92,8 @@ const Jeu: React.FC = () => {
         setEssaiCourant={setEssaiCourant}
         onEnter={handleSoumettreEssai}
         inactif={finPartie}
+        // VH transferer l'action de recommencer
+        onRecommencer={recommencerPartie}
       />
       {message && (
         <Snackbar open autoHideDuration={6000} onClose={() => setMessage(null)}>

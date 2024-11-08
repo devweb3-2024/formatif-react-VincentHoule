@@ -20,7 +20,8 @@ const GrilleMot: React.FC<GrilleMotsProps> = ({
 
   const obtenirCouleurLettre = (letter: string, index: number) => {
     if (!motCible) return 'default';
-    if (motCible[index] === letter) return 'success.main';
+    // VH comparer les lettres sans prendre en compte les accents
+    if (motCible[index].normalize('NFD').replace(/[\u0300-\u036f]/g, "") === letter) return 'success.main';
     if (motCible.includes(letter)) return 'warning.main';
     return 'grey.500';
   };
@@ -37,7 +38,8 @@ const GrilleMot: React.FC<GrilleMotsProps> = ({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  backgroundColor: obtenirCouleurLettre(letter, index),
+                  // VH mettre une condition pour activer les couleur
+                  backgroundColor: rowIndex < essais.length ? obtenirCouleurLettre(letter, index) : 'grey.500',
                   color: 'white',
                   fontSize: 24,
                   fontWeight: 'bold',

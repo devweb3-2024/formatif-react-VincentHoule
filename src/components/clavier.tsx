@@ -5,6 +5,7 @@ interface ClavierProps {
   essaiCourant: string;
   setEssaiCourant: React.Dispatch<React.SetStateAction<string>>;
   onEnter: () => void;
+  onRecommencer: () => void;
   inactif: boolean;
 }
 
@@ -12,6 +13,7 @@ const Clavier: React.FC<ClavierProps> = ({
   essaiCourant,
   setEssaiCourant,
   onEnter,
+  onRecommencer,
   inactif,
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -21,6 +23,8 @@ const Clavier: React.FC<ClavierProps> = ({
     }
   };
 
+
+  
   return (
     <Box sx={{ marginTop: 2, display: 'flex', gap: 2 }}>
       <TextField
@@ -34,6 +38,9 @@ const Clavier: React.FC<ClavierProps> = ({
       />
       <Button variant="contained" onClick={onEnter} disabled={inactif}>
         Entrer
+      </Button>
+      <Button variant='contained' onClick={onRecommencer}>
+        Recommencer
       </Button>
     </Box>
   );
